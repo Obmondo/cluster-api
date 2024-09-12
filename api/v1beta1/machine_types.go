@@ -94,6 +94,9 @@ type MachineSpec struct {
 	// +kubebuilder:validation:MinLength=1
 	ClusterName string `json:"clusterName"`
 
+	// TODO : Add a field named `taints`. These taints will be propagated from the Machine to the
+	// corresponding node.
+
 	// Bootstrap is a reference to a local struct which encapsulates
 	// fields to configure the Machine’s bootstrapping mechanism.
 	Bootstrap Bootstrap `json:"bootstrap"`

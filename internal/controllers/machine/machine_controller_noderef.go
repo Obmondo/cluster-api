@@ -135,6 +135,8 @@ func (r *Reconciler) reconcileNode(ctx context.Context, s *scope) (ctrl.Result, 
 
 	_, nodeHadInterruptibleLabel := node.Labels[clusterv1.InterruptibleLabel]
 
+	// TODO : Compute taints to be propagated from Machine to the corresponding node.
+
 	// Reconcile node taints
 	if err := r.patchNode(ctx, remoteClient, node, nodeLabels, nodeAnnotations, machine); err != nil {
 		return ctrl.Result{}, errors.Wrapf(err, "failed to reconcile Node %s", klog.KObj(node))
@@ -179,6 +181,14 @@ func getManagedLabels(labels map[string]string) map[string]string {
 	}
 
 	return managedLabels
+}
+
+// getManagedTaints gets a map[string]string and returns another map[string]string
+// filtering out taints not managed by CAPI.
+func getManagedTaints(taints map[string]string) map[string]string {
+	// TODO : implement.
+
+	return map[string]string{}
 }
 
 // summarizeNodeConditions summarizes a Node's conditions and returns the summary of condition statuses and concatenate failed condition messages:
@@ -291,6 +301,12 @@ func (r *Reconciler) patchNode(ctx context.Context, remoteClient client.Client, 
 		}
 	}
 	annotations.AddAnnotations(newNode, map[string]string{clusterv1.LabelsFromMachineAnnotation: strings.Join(labelsFromCurrentReconcile, ",")})
+
+	// TODO :
+	// Store the user managed taints in an annotation.
+	// So, during reconciliation loop (i + 1), that annotation represents the user managed taints for
+	// reconciliation loop i. The annotation can be used to determine the diff in user managed taints,
+	// or what taints should be added / removed during this (i + 1)th loop.
 
 	// Drop the NodeUninitializedTaint taint on the node given that we are reconciling labels.
 	hasTaintChanges := taints.RemoveNodeTaint(newNode, clusterv1.NodeUninitializedTaint)
